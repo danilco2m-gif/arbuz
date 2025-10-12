@@ -1,0 +1,31 @@
+import requests
+from bs4 import BeautifulSoup
+
+class CurrencyConverter:
+    def __init__(self):
+        self.exchange_rate = self.get_exchange_rate()
+
+    def get_exchange_rate(self):
+        url = "https://www.x-rates.com/calculator/?from=UAH&to=USD&amount=1"
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        rate_text = soup.find("span", class_="ccOutputTrail").previous_sibling
+        rate = float(rate_text)
+        return rate
+
+    def uah_to_usd(self, uah_amount):
+        return uah_amount * self.exchange_rate
+
+
+if __name__ == "__main__":
+    converter = CurrencyConverter()
+    print(f"USD/UAH rate: {converter.exchange_rate}")
+
+    try:
+        uah_amount = float(input("Enter amount in UAH: "))
+        usd_amount = converter.uah_to_usd(uah_amount)
+        print(f"{uah_amount} UAH = {usd_amount:.2f} USD")
+    except ValueError:
+        print("Please enter a valid number.")
+
